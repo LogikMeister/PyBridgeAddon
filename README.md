@@ -1,3 +1,5 @@
+![PyBridge](https://github.com/LogikMeister/PyBridge/blob/master/logo.png)
+
 # PyBridge
 
 PyBridge: Integration for Windows applications (Electron, etc.), enabling asynchronous calls to Python 3.8.10 functions from Node.js, using Pybind11 and an independent C++ thread pool.
