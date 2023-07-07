@@ -163,4 +163,4 @@ As a new coder myself, I warmly welcome code contributions to PyBridge. Please d
 
 ## License
 
-PyBridge is licensed under [INSERT LICENSE HERE]. See the LICENSE file for details.
+PyBridge is licensed under [MIT]. See the [LICENSE](LICENSE) file for details.
