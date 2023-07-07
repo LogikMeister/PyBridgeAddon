@@ -52,6 +52,9 @@ Both CommonJS and ESM packages will be installed by Rollup.
 Calling a simple python function.
 
 Python script:
+
+app.py
+
 ```python
     import time
 
