@@ -20,9 +20,9 @@ PyBridge: Integration for Windows applications (Electron, etc.), enabling asynch
 
 ### Prerequisites
 
-- Node.js (version 16 or higher) (Lower versions of node.js have not been tested)
-- Python 3.8.10
-- Pybind11 (version 2.10.4)
+- **Node.js** (version 16 or higher) (Lower versions of node.js have not been tested)
+- **Python** 3.8.10
+- **Pybind11** (version 2.10.4)
 
 ### Installation
 
@@ -36,7 +36,7 @@ PyBridge: Integration for Windows applications (Electron, etc.), enabling asynch
 
     If you have already installed **python**, **vs2019** or higher versions, you don't need to install **windows-build-tools**.
 
-    The project is compiled using node-gyp, thus requiring the Node.js addon compiler.
+    The project is compiled using ****node-gyp**, thus requiring the Node.js addon compiler.
 
 2. Install PyBridge from npm.
 
@@ -46,8 +46,8 @@ PyBridge: Integration for Windows applications (Electron, etc.), enabling asynch
 
 ## Usage
 
-In the Node.js environment, you can use JS/TS according to your preference.
-Both CommonJS and ESM packages will be installed by Rollup.
+In the Node.js environment, you can use **JS/TS** according to your preference.
+Both **CommonJS**** and **ESM** packages will be installed by Rollup.
 
 ### Basic Usage
 
