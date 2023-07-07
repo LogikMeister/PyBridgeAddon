@@ -10,14 +10,14 @@ export default {
             file: "dist/cjs/index.js",
             format: "cjs",
             plugins: [
-                terser()
+                // terser()
             ]
         },
         {
             file: "dist/esm/index.js",
             format: "esm",
             plugins: [
-                terser()
+                // terser()
             ]
         }
     ],
