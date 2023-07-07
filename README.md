@@ -14,9 +14,9 @@ PyBridge: Integration for Windows applications (Electron, etc.), enabling asynch
 
 ## Getting Started
 
-1. PyBridge provides Python call support through Node extension bindings, utilizing an independent thread pool instead of Libuv in Node.js.
+1. PyBridge provides Python call support through Node extension bindings, utilizing **an independent thread pool instead of Libuv** in Node.js.
 2. This has two major advantages: first, it keeps the two systems isolated; second, it circumvents the limitations of the Python GIL lock. Submitting multiple tasks, especially compute-intensive ones, could otherwise lead to Libuv thread pool blocking. 
-3. PyBridge is designed with Python 3.8.10 in mind, which is the last version supporting Windows 7. The repository includes headers, libraries, and DLLs required by node-gyp. PyBridge supports both TypeScript and ESM/CJS modules in your application.
+3. PyBridge is designed with **Python 3.8.10** in mind, which is the last version supporting Windows 7. The repository includes headers, libraries, and DLLs required by node-gyp. PyBridge supports both **TypeScript** and **ESM/CJS modules** in your application.
 
 ### Prerequisites
 
