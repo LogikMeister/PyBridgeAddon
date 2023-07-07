@@ -7,10 +7,12 @@
   "types": "dist/cjs/index.d.ts",
   "type": "module",
   "scripts": {
-    "install": "npm run build",
+    "preinstall": "npm run build:dependencies",
+    "install": "npm run build:addon",
     "build:ts": "rimraf dist && rollup -c",
     "build:addon": "node-gyp rebuild",
-    "build": "npm run build:ts && npm run build:addon"
+    "build": "npm run build:ts && npm run build:addon",
+    "build:dependencies": "npm i node-gyp"
   },
   "authors": [
     "LogikMeister (zhaoyiran@gmail.com)"
@@ -22,6 +24,15 @@
     "napi",
     "node",
     "pybind11"
+  ],
+  "files": [
+    "dist",
+    "dll",
+    "include",
+    "lib",
+    "src/cpp",
+    "binding.gyp",
+    "LICENSE"
   ],
   "license": "MIT",
   "gypfile": true,

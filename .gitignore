@@ -1,7 +1,6 @@
 .vscode
 package-lock.json
 build
-dist
 node_modules
 resource
 test
