@@ -1,8 +1,8 @@
-![PyBridge](https://github.com/LogikMeister/PyBridge/blob/master/logo.png)
+![PyBridgeAddon](https://github.com/LogikMeister/PyBridgeAddon/blob/master/logo.png)
 
-# PyBridge
+# PyBridgeAddon
 
-PyBridge: Integration for Windows applications (Electron, etc.), enabling asynchronous calls to Python 3.8.10 functions from Node.js, using Pybind11 and an independent C++ thread pool.
+PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling asynchronous calls to Python 3.8.10 functions from Node.js, using Pybind11 and an independent C++ thread pool.
 
 ## Table of Contents
 1. [Getting Started](#getting-started)
@@ -14,9 +14,9 @@ PyBridge: Integration for Windows applications (Electron, etc.), enabling asynch
 
 ## Getting Started
 
-1. PyBridge provides Python call support through Node extension bindings, utilizing **an independent thread pool instead of Libuv** in Node.js.
+1. PyBridgeAddon provides Python call support through Node extension bindings, utilizing **an independent thread pool instead of Libuv** in Node.js.
 2. This has two major advantages: first, it keeps the two systems isolated; second, it circumvents the limitations of the Python GIL lock. Submitting multiple tasks, especially compute-intensive ones, could otherwise lead to Libuv thread pool blocking. 
-3. PyBridge is designed with **Python 3.8.10** in mind, which is the last version supporting Windows 7. The repository includes headers, libraries, and DLLs required by node-gyp. PyBridge supports both **TypeScript** and **ESM/CJS modules** in your application.
+3. PyBridgeAddon is designed with **Python 3.8.10** in mind, which is the last version supporting Windows 7. The repository includes headers, libraries, and DLLs required by node-gyp. PyBridgeAddon supports both **TypeScript** and **ESM/CJS modules** in your application.
 
 ### Prerequisites
 
@@ -38,10 +38,10 @@ PyBridge: Integration for Windows applications (Electron, etc.), enabling asynch
 
     The project is compiled using ****node-gyp**, thus requiring the Node.js addon compiler.
 
-2. Install PyBridge from npm.
+2. Install PyBridgeAddon from npm.
 
     ``` shell
-    npm install py-bridge
+    npm install py-bridge-addon
     ```
 
 ## Usage
@@ -143,7 +143,7 @@ interpreter.finalize();
 
 ## Contributing
 
-As a new coder myself, I warmly welcome code contributions to PyBridge. Please don't hesitate to submit your suggestions or report bugs.
+As a new coder myself, I warmly welcome code contributions to PyBridgeAddon. Please don't hesitate to submit your suggestions or report bugs.
 
 ## Changelog
 
@@ -165,4 +165,4 @@ As a new coder myself, I warmly welcome code contributions to PyBridge. Please d
 
 ## License
 
-PyBridge is licensed under [MIT]. See the [LICENSE](LICENSE) file for details.
+PyBridgeAddon is licensed under [MIT]. See the [LICENSE](LICENSE) file for details.

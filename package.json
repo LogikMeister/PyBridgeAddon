@@ -1,5 +1,5 @@
 {
-  "name": "py-bridge",
+  "name": "py-bridge-addon",
   "version": "0.0.1",
   "description": "node call python3.8.10 in async mode using pybind11, c++ independent thread pool",
   "main": "dist/cjs/index.js",
