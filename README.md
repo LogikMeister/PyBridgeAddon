@@ -78,7 +78,7 @@ First:
 * The third parameter represents the number of threads in the thread pool.If you set this to null or undefined, the number of threads will be setted to **std::thread::hardware_concurrency()**
 
 ```typescript
-import { interpreter, ArgumentType } from 'py-bridge'
+import { interpreter, ArgumentType } from 'py-bridge-addon'
 
 interpreter.initialize(pythonHome, pythonPath, undefined);
 ```
