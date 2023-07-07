@@ -1,0 +1,39 @@
+{
+  "name": "py-bridge",
+  "version": "0.0.1",
+  "description": "node call python3.8.10 in async mode using pybind11, c++ independent thread pool",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/cjs/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "install": "npm run build",
+    "build:ts": "rimraf dist && rollup -c",
+    "build:addon": "node-gyp rebuild",
+    "build": "npm run build:ts && npm run build:addon"
+  },
+  "authors": [
+    "LogikMeister (zhaoyiran@gmail.com)"
+  ],
+  "keywords": [
+    "typescript",
+    "python3.8.10",
+    "c++17",
+    "napi",
+    "node",
+    "pybind11"
+  ],
+  "license": "MIT",
+  "gypfile": true,
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-terser": "^0.4.3",
+    "@rollup/plugin-typescript": "^11.1.2",
+    "@types/node": "^20.3.3",
+    "node-gyp": "^9.4.0",
+    "rimraf": "^5.0.1",
+    "rollup": "^3.26.1",
+    "tslib": "^2.6.0",
+    "typescript": "^5.1.6"
+  }
+}
