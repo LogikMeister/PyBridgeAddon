@@ -41,7 +41,7 @@ PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling a
 2. Install PyBridgeAddon from npm.
 
     ``` shell
-    npm install py-bridge-addon
+    npm install pybridge-addon
     ```
 
 ## Usage
@@ -101,12 +101,12 @@ First:
   ├── Tools/ - --  --  --  --  --  -- Can Delete
   ├── python.exe   --  --  --  --  -- Can Delete
   ├── pythonw.exe  --  --  --  --  -- Can Delete
-  └── pythonXX.dll --  --  --  --  -- Can Delete. When you install 'py-bridge-addon' using npm and execute your code, the directories containing the required pythonXX.dll will be automatically added to the path.
+  └── pythonXX.dll --  --  --  --  -- Can Delete. When you install 'pybridge-addon' using npm and execute your code, the directories containing the required pythonXX.dll will be automatically added to the path.
   
   ```
 
 ```typescript
-import { interpreter, ArgumentType } from 'py-bridge-addon'
+import { interpreter, ArgumentType } from 'pybridge-addon'
 
 interpreter.initialize(pythonHome, pythonPath, undefined);
 ```
