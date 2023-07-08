@@ -15,7 +15,7 @@
     "build:dependencies": "npm i node-gyp"
   },
   "authors": [
-    "LogikMeister (zhaoyiran@gmail.com)"
+    "LogikMeister (zhaoyirangod@gmail.com)"
   ],
   "keywords": [
     "typescript",
