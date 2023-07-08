@@ -14,15 +14,15 @@ PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling a
 
 ## Getting Started
 
-1. PyBridgeAddon provides Python call support through Node extension bindings, utilizing **an independent thread pool instead of Libuv** in Node.js.
+1. PyBridgeAddon provides Python call support through Node extension bindings, utilizing `an independent thread pool instead of Libuv` in Node.js.
 2. This has two major advantages: first, it keeps the two systems isolated; second, it circumvents the limitations of the Python GIL lock. Submitting multiple tasks, especially compute-intensive ones, could otherwise lead to Libuv thread pool blocking. 
-3. PyBridgeAddon is designed with **Python 3.8.10** in mind, which is the last version supporting Windows 7. The repository includes headers, libraries, and DLLs required by node-gyp. PyBridgeAddon supports both **TypeScript** and **ESM/CJS modules** in your application.
+3. PyBridgeAddon is designed with `Python 3.8.10` in mind, which is the last version supporting Windows 7. The repository includes headers, libraries, and DLLs required by node-gyp. PyBridgeAddon supports both `TypeScript` and `ESM/CJS modules` in your application.
 
 ### Prerequisites
 
-- **Node.js** (version 16 or higher) (Lower versions of node.js have not been tested)
-- **Python** 3.8.10
-- **Pybind11** (version 2.10.4)
+- `Node.js` (version 16 or higher) (Lower versions of node.js have not been tested)
+- `Python` 3.8.10
+- `Pybind11` (version 2.10.4)
 
 ### Installation
 
@@ -34,9 +34,9 @@ PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling a
     npm install --global --production windows-build-tools
     ```
 
-    If you have already installed **python**, **vs2019** or higher versions, you don't need to install **windows-build-tools**.
+    If you have already installed `python`, `vs2019` or higher versions, you don't need to install `windows-build-tools`.
 
-    The project is compiled using ****node-gyp**, thus requiring the Node.js addon compiler.
+    The project is compiled using `node-gyp`, thus requiring the Node.js addon compiler.
 
 2. Install PyBridgeAddon from npm.
 
@@ -46,8 +46,8 @@ PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling a
 
 ## Usage
 
-In the Node.js environment, you can use **JS/TS** according to your preference.
-Both **CommonJS**** and **ESM** packages will be installed by Rollup.
+In the Node.js environment, you can use `JS/TS` according to your preference.
+Both `CommonJS` and `ESM` packages will be installed by Rollup.
 
 ### Basic Usage
 
@@ -58,24 +58,52 @@ Python script:
 app.py
 
 ```python
-    import time
+import time
 
-    def call(a, b, c, d):
-        time.sleep(2)
-        print(a, b, c, d)
-        return [{"test": "test_result"}]
+def call(a, b, c, d):
+    time.sleep(2)
+    print(a, b, c, d)
+    return [{"test": "test_result"}]
 
-    def error(s):
-        raise Exception(s)
+def error(s):
+    raise Exception(s)
 ```
 
 Typescript:
 
 First:
 1. Initialize the python interpreter.
-* pythonHome is the path to the python root directory.
-* pythonPath is the path to store your python script.
-* The third parameter represents the number of threads in the thread pool.If you set this to null or undefined, the number of threads will be setted to **std::thread::hardware_concurrency()**
+* `pythonHome` is the path to the python root directory.
+
+* In the Python root directory, the `DLLs` and `Lib` are the only directories that need to be retained. All others can be deleted.
+
+  `DLLs`: This directory contains the dynamic link libraries (DLLs) required for Python runtime. DLLs provide core and standard functionality needed when Python is running.
+
+  `Lib`: This directory houses Python's standard library, a comprehensive suite of modules for various development tasks. The presence of this library makes Python a "batteries included" language, capable of supporting many common programming tasks right out of the box.
+
+* `pythonPath` is the path to store your python script.
+
+* `The third parameter` represents the number of threads in the thread pool. If you set this to null or undefined, the number of threads will be setted to `std::thread::hardware_concurrency()`
+
+* ```
+  PythonXX/
+  ├── DLLs/ ========================> Need To Keep
+  ├── Doc/  --  --  --  --  --  --  - Can Delete
+  ├── include/ --  --  --  --  --  -- Can Delete
+  ├── Lib/ =========================> Need To Keep
+  │   └── site-packages/
+  ├── libs/ -  --  --  --  --  --  -- Can Delete
+  ├── Scripts/ --  --  --  --  --  -- Can Delete
+  │   ├── pip.exe
+  │   ├── pip3.exe
+  │   ├── pip3.8.exe
+  │   └── ...
+  ├── Tools/ - --  --  --  --  --  -- Can Delete
+  ├── python.exe   --  --  --  --  -- Can Delete
+  ├── pythonw.exe  --  --  --  --  -- Can Delete
+  └── pythonXX.dll --  --  --  --  -- Can Delete
+  
+  ```
 
 ```typescript
 import { interpreter, ArgumentType } from 'py-bridge-addon'
@@ -85,11 +113,16 @@ interpreter.initialize(pythonHome, pythonPath, undefined);
 
 Second: 
 * Usage of decorator functions and normal addon api to call python function.
-* Tips:  The Args (referring to a certain type) and {test: string}[] (an array of objects with a 'test' property of type string) must both be a subset of the 'ArgumentType' type. 
+* Tips:  The `'Args'` (referring to a certain type) and `'Return'` must both be a subset of the `'ArgumentType'` type. 
 
 ```typescript
 
-interface Args {
+// The use of interface Args {} is not supported because interfaces enforce a stricter structure.
+// you can use type to define the data structure, 
+// which provides more flexibility for varying property keys, 
+// including those not known at the time of definition.
+
+type Args = {
     a: number;
     b: {
         name: string;
@@ -99,11 +132,15 @@ interface Args {
     d: { has_child: boolean };
 }
 
+type Return {
+   test: string; 
+}[]
+
 class Test {
     // A Python function caller is created using a classmethod decorator.
     // This uses the TypeScript 5 classmethod decorator. If you require TypeScript 4, especially for metadata, this method won't be suitable.
     @interpreter.definePyFunction("app", "call")
-    call(_: Args): Promise<{test: string}[]> {
+    call(_: Args): Promise<Return> {
         return new Promise(() => {});
     }
 }
@@ -126,7 +163,7 @@ test.call(data).then((res) => {
 });
 
 // The Python function is called using the normal add-on API.
-interpreter.callAsync<typeof data, number>("app", "call", data).then((res) => {
+interpreter.callAsync<typeof data, Return>("app", "call", data).then((res) => {
     console.log("The Python function result via the addon API: ", res)
 }).catch((err) => {
     console.log(err)
