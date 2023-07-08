@@ -101,7 +101,7 @@ First:
   ├── Tools/ - --  --  --  --  --  -- Can Delete
   ├── python.exe   --  --  --  --  -- Can Delete
   ├── pythonw.exe  --  --  --  --  -- Can Delete
-  └── pythonXX.dll --  --  --  --  -- Can Delete
+  └── pythonXX.dll --  --  --  --  -- Can Delete. When you install 'py-bridge-addon' using npm and execute your code, the directories containing the required pythonXX.dll will be automatically added to the path.
   
   ```
 
