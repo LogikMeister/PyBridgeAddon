@@ -194,6 +194,8 @@ def call():
 ```
 
 ```typescript
+import { interpreter, event, ArgumentType } from '../dist/esm/index.js'
+
 interpreter.initialize(pythonHome, pythonPath, undefined);
 
 type Return = {test: string}[];
