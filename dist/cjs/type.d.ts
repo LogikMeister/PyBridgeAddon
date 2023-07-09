@@ -7,7 +7,15 @@ export interface Addon {
     isInitialized(): boolean;
     initializePython(pythonHome: string, pythonPath: string, threads?: number): boolean;
     finalizePython(): boolean;
-    callPythonFunctionSync<A extends ArgumentType, R extends ArgumentType>(moduleName: string, functionName: string, functionArgs: A): R;
-    callPythonFunctionAsync<A extends ArgumentType, R extends ArgumentType>(moduleName: string, functionName: string, functionArgs: A): Promise<R>;
+    callPythonFunctionSync<A extends ArgumentType, R extends ArgumentType>(moduleName: string, functionName: string, functionArgs?: A): R;
+    callPythonFunctionAsync<A extends ArgumentType, R extends ArgumentType>(moduleName: string, functionName: string, functionArgs?: A, handlers?: EventMap): Promise<R>;
 }
+export type EventHandler<A extends ArgumentType> = (args: A) => void;
+export type EventMap = {
+    [event: string]: EventHandler<any>;
+};
+export type EventGroupType = {
+    moduleName: string;
+    methodName: string;
+};
 export {};

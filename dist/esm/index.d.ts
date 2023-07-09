@@ -1,3 +1,4 @@
 import interpreter from './interpreter';
+import event from './event';
 import { ArgumentType } from './type';
-export { interpreter, ArgumentType };
+export { interpreter, event, ArgumentType };

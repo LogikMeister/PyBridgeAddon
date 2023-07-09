@@ -8,46 +8,37 @@
 #include "../gil.hpp"
 #include "../thread_pool/singleton.hpp"
 #include "../transform.hpp"
+#include "../data.hpp"
+#include "../triggers.hpp"
+#include <iostream>
 
 namespace py = pybind11;
 
-struct WorkData {
-    std::string module_name;
-    std::string function_name;
-    Variant function_args;
-    Variant result;
-    std::string error_str;
-};
-
-struct CompleteData {
-    uv_async_t async;
-    napi_env env;
-    napi_deferred deferred;
-    WorkData* work_data;
-};
-
 // Call Python function
 inline napi_value CallPythonFunctionAsync(napi_env env, napi_callback_info info) {
-    size_t argc = 3;
-    napi_value argv[3];
+    size_t argc = 4;
+    napi_value argv[4];
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     // Check parameters
-    if (argc < 3) {
+    if (argc < 2) {
         napi_throw_type_error(env, nullptr, "Wrong number of arguments");
         return nullptr;
     }
     
-    napi_valuetype arg_types[3];
-    for (int i=0; i<3; i++) {
+    napi_valuetype arg_types[4];
+    for (int i=0; i<2; i++) {
         napi_typeof(env, argv[i], &arg_types[i]);
     }
     if (
         arg_types[0] != napi_string ||
-        arg_types[1] != napi_string ||
-        (arg_types[2] != napi_object && arg_types[2] != napi_null && arg_types[2] != napi_undefined)
+        arg_types[1] != napi_string
     ) {
         napi_throw_type_error(env, nullptr, "Wrong arguments");
+    }
+
+    if (argc >= 4) {
+        napi_typeof(env, argv[3], &arg_types[3]);
     }
 
     // Get parameters
@@ -59,7 +50,17 @@ inline napi_value CallPythonFunctionAsync(napi_env env, napi_callback_info info)
 
     // Transform the napi_value to Variant
     Variant function_args;
-    transform_n_2_variant(env, argv[2], function_args);
+    if (argc >= 3) {
+        napi_typeof(env, argv[2], &arg_types[2]);
+        if (arg_types[2] != napi_object && arg_types[2] != napi_null && arg_types[2] != napi_undefined) {
+            napi_throw_type_error(env, nullptr, "Wrong arguments");
+            return nullptr;
+        }
+        transform_n_2_variant(env, argv[2], function_args);
+    } else {
+        function_args = Variant();
+    }
+    
 
     // Call function
     // Create promise
@@ -73,8 +74,81 @@ inline napi_value CallPythonFunctionAsync(napi_env env, napi_callback_info info)
     complete_data->deferred = deferred;
     complete_data->work_data = work_data;
 
-    // Listening work completed event
+    // Get event callbacks
+    if (argc >= 4 && arg_types[3] == napi_object) {
+        napi_value event_callbacks_obj = argv[3];
+        napi_value obj_keys;
+        napi_get_property_names(env, event_callbacks_obj, &obj_keys);
+
+        uint32_t key_len;
+        napi_get_array_length(env, obj_keys, &key_len);
+
+        for (size_t i=0; i<key_len; i++) {
+            napi_value obj_key, fn_callback;
+            napi_get_element(env, obj_keys, i, &obj_key);
+            napi_get_property(env, event_callbacks_obj, obj_key, &fn_callback);
+
+            napi_valuetype fn_callback_type;
+            napi_typeof(env, fn_callback, &fn_callback_type);
+            if (fn_callback_type == napi_function) {
+                size_t obj_key_len;
+                napi_get_value_string_utf8(env, obj_key, nullptr, 0, &obj_key_len);
+                std::string obj_key_str(obj_key_len, '\0');
+                napi_get_value_string_utf8(env, obj_key, &obj_key_str[0], obj_key_len + 1, &obj_key_len);
+                // Create callback reference
+                napi_ref fn_callback_ref;
+                napi_create_reference(env, fn_callback, 1, &fn_callback_ref);
+                complete_data->event_callbacks[obj_key_str] = fn_callback_ref;
+            }
+        }
+    }
+
+    // Get libuv loop;
     uv_loop_t* loop = uv_default_loop();
+
+    // Listening for events
+    uv_async_init(loop, &complete_data->async_event, [](uv_async_t* handle) {
+        CompleteData* complete_data = (CompleteData*)(handle->data);
+        // Create handle scope
+        napi_handle_scope scope;
+        napi_open_handle_scope(complete_data->env, &scope);
+
+        while(true) {
+            // Get event from queue
+            std::pair<std::string, Variant> event;
+            {
+                // Lock event queue
+                std::lock_guard<std::mutex> lock(complete_data->event_mutex);
+                if (complete_data->event_queue.empty()) {
+                    break;
+                }
+                event = std::move(complete_data->event_queue.front());
+                complete_data->event_queue.pop();
+            }
+            // Call event callback
+            auto it = complete_data->event_callbacks.find(event.first);
+            if (it != complete_data->event_callbacks.end()) {
+                // Transform the Variant to napi_value
+                napi_value event_value = transform_variant_2_n(complete_data->env, event.second);
+                // Call callback
+                napi_value global;
+                napi_get_global(complete_data->env, &global);
+                napi_value fn_callback;
+                napi_get_reference_value(complete_data->env, it->second, &fn_callback);
+                napi_value fn_callback_result;
+                napi_call_function(complete_data->env, global, fn_callback, 1, &event_value, &fn_callback_result);
+            } else {
+                std::string& module_name = complete_data->work_data->module_name;
+                std::string& function_name = complete_data->work_data->function_name;
+                std::cout << module_name << "." << function_name << " event callback not found: " << event.first << std::endl;
+            }
+        }
+
+        // Close handle scope
+        napi_close_handle_scope(complete_data->env, scope);
+    });
+
+    // Listening work completed event
     uv_async_init(loop, &complete_data->async, [](uv_async_t* handle) {
         CompleteData* complete_data = (CompleteData*)handle->data;
         WorkData* work_data = complete_data->work_data;
@@ -103,7 +177,14 @@ inline napi_value CallPythonFunctionAsync(napi_env env, napi_callback_info info)
 
         // Close handle scope
         napi_close_handle_scope(complete_data->env, scope);
+
+        // Delete work data
         delete work_data;
+        // Close async event
+        uv_close((uv_handle_t*)&complete_data->async_event, [](uv_handle_t* handle) {
+            // Empty
+        });
+        // Close async
         uv_close((uv_handle_t*)handle, [](uv_handle_t* handle) {
             delete (CompleteData*)handle->data;
         });
@@ -114,6 +195,8 @@ inline napi_value CallPythonFunctionAsync(napi_env env, napi_callback_info info)
         WorkData* work_data = complete_data->work_data;
         PythonGILState::getInstance()->ensureGIL();
         try {
+            // Initialize the event trigger
+            initialize_event_trigger(complete_data);
             // Transform Variant to py::object
             py::object arguments = transform_variant_2_p(work_data->function_args);
             // Call python function
@@ -122,6 +205,8 @@ inline napi_value CallPythonFunctionAsync(napi_env env, napi_callback_info info)
             py::object result_obj;
             if (py::isinstance<py::dict>(arguments)) {
                 result_obj = function.attr("__call__")(*py::tuple(), **arguments);
+            } else if (py::isinstance<py::none>(arguments)) {
+                result_obj = function();
             } else {
                 result_obj = function(arguments);
             }

@@ -17,19 +17,18 @@ inline napi_value CallPythonFunctionSync(napi_env env, napi_callback_info info) 
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     // check parameters
-    if (argc < 3) {
+    if (argc < 2) {
         napi_throw_type_error(env, nullptr, "Wrong number of arguments");
         return nullptr;
     }
     
     napi_valuetype arg_types[3];
-    for (int i=0; i<3; i++) {
+    for (int i=0; i<2; i++) {
         napi_typeof(env, argv[i], &arg_types[i]);
     }
     if (
         arg_types[0] != napi_string ||
-        arg_types[1] != napi_string ||
-        (arg_types[2] != napi_object && arg_types[2] != napi_null && arg_types[2] != napi_undefined)
+        arg_types[1] != napi_string
     ) {
         napi_throw_type_error(env, nullptr, "Wrong arguments");
     }
@@ -43,9 +42,18 @@ inline napi_value CallPythonFunctionSync(napi_env env, napi_callback_info info) 
 
     // Transform the napi_value to Variant
     Variant function_args;
-    transform_n_2_variant(env, argv[2], function_args);
+    if (argc >= 3) {
+        napi_typeof(env, argv[2], &arg_types[2]);
+        if (arg_types[2] != napi_object && arg_types[2] != napi_null && arg_types[2] != napi_undefined) {
+            napi_throw_type_error(env, nullptr, "Wrong arguments");
+            return nullptr;
+        }
+        transform_n_2_variant(env, argv[2], function_args);
+    } else {
+        function_args = Variant();
+    }
 
-    // call function
+    // Call function
     Variant variant_value;
     PythonGILState::getInstance()->ensureGIL();
     try {
@@ -56,6 +64,8 @@ inline napi_value CallPythonFunctionSync(napi_env env, napi_callback_info info) 
         py::object result_obj;
         if (py::isinstance<py::dict>(arguments)) {
             result_obj = function.attr("__call__")(*py::tuple(), **arguments);
+        } else if (py::isinstance<py::none>(arguments)) {
+                result_obj = function();
         } else {
             result_obj = function(arguments);
         }

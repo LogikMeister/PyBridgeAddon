@@ -61,6 +61,76 @@ typeof SuppressedError === "function" ? SuppressedError : function (error, suppr
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
 };
 
+class EventGroup {
+    constructor() {
+        this.handlers = {};
+    }
+    // Add an event handler
+    on(event, handler) {
+        this.handlers[event] = handler;
+    }
+    // Delete an event handler
+    off(event) {
+        delete this.handlers[event];
+    }
+    // Get all event handlers
+    getHandlers() {
+        return this.handlers;
+    }
+    // Delete all event handlers
+    offAll() {
+        this.handlers = {};
+    }
+}
+class EventStore {
+    constructor() {
+        this.groups = new Map();
+    }
+    getEventGroupKey({ moduleName, methodName }) {
+        return `${moduleName}.${methodName}`;
+    }
+    set(moduleName, methodName, event, eventHandler) {
+        const key = this.getEventGroupKey({ moduleName, methodName });
+        if (!this.groups.has(key)) {
+            this.groups.set(key, new EventGroup());
+        }
+        const group = this.groups.get(key);
+        group === null || group === void 0 ? void 0 : group.on(event, eventHandler);
+    }
+    clear(moduleName, methodName, event) {
+        const key = this.getEventGroupKey({ moduleName, methodName });
+        if (!this.groups.has(key)) {
+            return;
+        }
+        const group = this.groups.get(key);
+        group === null || group === void 0 ? void 0 : group.off(event);
+    }
+    clearAll(moduleName, methodName) {
+        const key = this.getEventGroupKey({ moduleName, methodName });
+        if (!this.groups.has(key)) {
+            return;
+        }
+        const group = this.groups.get(key);
+        group === null || group === void 0 ? void 0 : group.offAll();
+    }
+    getHandlers(moduleName, methodName) {
+        var _a;
+        const key = this.getEventGroupKey({ moduleName, methodName });
+        return (_a = this.groups.get(key)) === null || _a === void 0 ? void 0 : _a.getHandlers();
+    }
+    definePyEvent(moduleName, methodName, event) {
+        // Method Decorator
+        const instance = this;
+        return function (target, context) {
+            context.addInitializer(function () {
+                instance.set(moduleName, methodName, event, target.bind(this));
+            });
+            return target;
+        };
+    }
+}
+const event = new EventStore();
+
 function makeGuardDecorator(fn, errMessage) {
     return function (t) {
         // Method Decorator
@@ -136,12 +206,13 @@ let Interpreter = (() => {
                 if (!this.isInitialized) {
                     throw new Error("Python interpreter has not been initialized.");
                 }
-                return addon.callPythonFunctionAsync(moduleName, methodName, args);
+                const handlers = event.getHandlers(moduleName, methodName);
+                return addon.callPythonFunctionAsync(moduleName, methodName, args, handlers);
             }
             definePyFunction(moduleName, methodName) {
                 // Method Decorator
                 const instance = this;
-                return function (target, content) {
+                return function (target, context) {
                     const replaceMethod = function (args) {
                         return instance.callAsync(moduleName, methodName, args);
                     };
@@ -157,4 +228,5 @@ let Interpreter = (() => {
 })();
 const interpreter = new Interpreter();
 
+exports.event = event;
 exports.interpreter = interpreter;

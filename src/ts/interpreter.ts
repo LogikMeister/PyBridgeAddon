@@ -1,3 +1,4 @@
+import event from "./event";
 import { ArgumentType, Addon } from "./type";
 import { makeGuardDecorator } from './decorator';
 import { createRequire } from 'node:module';
@@ -57,31 +58,32 @@ class Interpreter {
         this.isInitialized = false;
     }
 
-    public call<A extends ArgumentType, R extends ArgumentType>(moduleName: string, methodName: string, args: A): R {
+    public call<A extends ArgumentType, R extends ArgumentType>(moduleName: string, methodName: string, args?: A): R {
         if (!this.isInitialized) {
             throw new Error("Python interpreter has not been initialized.");
         }
         return addon.callPythonFunctionSync<A, R>(moduleName, methodName, args);
     }
 
-    public callAsync<A extends ArgumentType, R extends ArgumentType>(moduleName: string, methodName: string, args: A): Promise<R> {
+    public callAsync<A extends ArgumentType, R extends ArgumentType>(moduleName: string, methodName: string, args?: A): Promise<R> {
         if (!this.isInitialized) {
             throw new Error("Python interpreter has not been initialized.");
         }
-        return addon.callPythonFunctionAsync(moduleName, methodName, args);
+        const handlers = event.getHandlers(moduleName, methodName);
+        return addon.callPythonFunctionAsync(moduleName, methodName, args, handlers);
     }
 
-    public definePyFunction<A extends ArgumentType, R extends ArgumentType>(moduleName: string, methodName: string) {
+    public definePyFunction(moduleName: string, methodName: string) {
         // Method Decorator
         const instance = this;
-        return function <This, Args extends A, Return extends R>(
+        return function <This, Args extends ArgumentType, Return extends ArgumentType>(
             target: (this: This, args: Args) => Promise<Return>,
-            content: ClassMethodDecoratorContext<
+            context: ClassMethodDecoratorContext<
                 This,
                 (this: This, args: Args) => Promise<Return>
             >
         ) {
-            const replaceMethod = function (this: This, args: Args ) {
+            const replaceMethod = function (this: This, args?: Args ) {
                 return instance.callAsync<Args, Return>(moduleName, methodName, args);
             }
             return replaceMethod;
