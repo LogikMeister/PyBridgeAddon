@@ -1,6 +1,6 @@
 {
   "name": "pybridge-addon",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "node call python3.8.10 in async mode using pybind11, c++ independent thread pool",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

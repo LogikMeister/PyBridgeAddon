@@ -240,6 +240,7 @@ As a new coder myself, I warmly welcome code contributions to PyBridgeAddon. Ple
 ## Changelog
 
 1. 2023/07/07: First Version.
+2. 2023/07/10: Fixed bugs and added tests.
 
 ## Tips
 
