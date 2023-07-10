@@ -1,7 +1,7 @@
 {
   "name": "pybridge-addon",
-  "version": "0.0.6",
-  "description": "node call python3.8.10 in async mode using pybind11, c++ independent thread pool",
+  "version": "0.0.7",
+  "description": "Integration for Windows applications (Electron, etc.), enabling asynchronous calls to Python functions from Node.js, using Pybind11 and an independent C++ thread pool.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/cjs/index.d.ts",
@@ -10,7 +10,7 @@
     "postinstall": "npm prune --production",
     "install": "npm run build:addon",
     "build:ts": "rimraf dist && rollup -c",
-    "build:addon": "node-gyp rebuild",
+    "build:addon": "node-gyp rebuild && node src/script/copy.js",
     "build": "npm run build:ts && npm run build:addon",
     "build:dependencies": "npm i node-gyp",
     "test": "nyc mocha -r ts-node/register 'tests/**/*.test.ts'",
@@ -33,7 +33,7 @@
   ],
   "keywords": [
     "typescript",
-    "python3.8.10",
+    "python",
     "c++17",
     "napi",
     "node",
@@ -41,10 +41,10 @@
   ],
   "files": [
     "dist",
-    "dll",
     "include",
-    "lib",
     "src/cpp",
+    "src/script",
+    "tests",
     "binding.gyp",
     "LICENSE"
   ],
@@ -76,10 +76,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LogikMeister/PyBridge.git"
+    "url": "git+https://github.com/LogikMeister/PyBridgeAddon.git"
   },
   "bugs": {
-    "url": "https://github.com/LogikMeister/PyBridge/issues"
+    "url": "https://github.com/LogikMeister/PyBridgeAddon/issues"
   },
-  "homepage": "https://github.com/LogikMeister/PyBridge"
+  "homepage": "https://github.com/LogikMeister/PyBridgeAddon"
 }

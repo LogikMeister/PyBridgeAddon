@@ -1,6 +1,7 @@
 .vscode
 package-lock.json
 build
+dll
 node_modules
 resource
 __pycache__

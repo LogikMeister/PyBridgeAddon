@@ -150,14 +150,14 @@ const resolve = (p) => path.resolve(__dirname, p);
 let addon;
 try {
     const dynamic_linked_library_path = resolve('../../dll');
-    process.env.PATH = dynamic_linked_library_path + ";" + process.env.PATH;
+    process.env.PATH = dynamic_linked_library_path + ';' + process.env.PATH;
     addon = require(resolve('../../build/Release/pybridge'));
 }
 catch (e) {
     throw new Error('[Addon Import Error]: Failed to load pybridge addon. Please check if pythonXX.dll exists in the environment variable PATH.');
 }
-const needUnintialized = makeGuardDecorator((property, instance, ..._rest) => instance[property] === false, "Python interpreter has not been initialized");
-const needUnintializFailed = makeGuardDecorator((property, instance, ..._rest) => instance[property] === false, "Python interpreter initialization failure is destructive. You need to restart you node application to initialize Python interpreter.");
+const needUnintialized = makeGuardDecorator((property, instance, ..._rest) => instance[property] === false, 'Python interpreter has not been initialized');
+const needUnintializFailed = makeGuardDecorator((property, instance, ..._rest) => instance[property] === false, 'Python interpreter initialization failure is destructive. You need to restart you node application to initialize Python interpreter.');
 let Interpreter = (() => {
     var _a;
     let _instanceExtraInitializers = [];
@@ -192,13 +192,13 @@ let Interpreter = (() => {
             }
             call(moduleName, methodName, args) {
                 if (!this.isInitialized) {
-                    throw new Error("Python interpreter has not been initialized.");
+                    throw new Error('Python interpreter has not been initialized.');
                 }
                 return addon.callPythonFunctionSync(moduleName, methodName, args);
             }
             callAsync(moduleName, methodName, args) {
                 if (!this.isInitialized) {
-                    throw new Error("Python interpreter has not been initialized.");
+                    throw new Error('Python interpreter has not been initialized.');
                 }
                 const handlers = event.getHandlers(moduleName, methodName);
                 return addon.callPythonFunctionAsync(moduleName, methodName, args, handlers);
@@ -215,7 +215,7 @@ let Interpreter = (() => {
             }
         },
         (() => {
-            _initialize_decorators = [needUnintializFailed("pythonInitalizFailed"), needUnintialized("isInitialized")];
+            _initialize_decorators = [needUnintializFailed('pythonInitalizFailed'), needUnintialized('isInitialized')];
             __esDecorate(_a, null, _initialize_decorators, { kind: "method", name: "initialize", static: false, private: false, access: { has: obj => "initialize" in obj, get: obj => obj.initialize } }, null, _instanceExtraInitializers);
         })(),
         _a;

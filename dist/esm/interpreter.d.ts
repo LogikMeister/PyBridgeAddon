@@ -1,4 +1,4 @@
-import { ArgumentType } from "./type";
+import { ArgumentType } from './type';
 declare class Interpreter {
     private isInitialized;
     private pythonInitalizFailed;
