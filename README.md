@@ -18,7 +18,7 @@ PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling a
 2. This has two major advantages: first, it keeps the two systems isolated; second, it circumvents the limitations of the Python GIL lock. Submitting multiple tasks, especially compute-intensive ones, could otherwise lead to Libuv thread pool blocking. 
 3. PyBridgeAddon is designed with `Python 3.8.10` in mind, which is the last version supporting Windows 7. The repository includes headers, libraries, and DLLs required by node-gyp. PyBridgeAddon supports both `TypeScript` and `ESM/CJS modules` in your application.
 
-<div align=center><img src="https://github.com/LogikMeister/PyBridgeAddon/blob/master/prototype.png" alt="Image" style="max-width: 400px;"></div>
+<div align=center><img src="https://github.com/LogikMeister/PyBridgeAddon/blob/master/prototype.png" alt="Prototype" width="400"></div>
 
 
 ### Prerequisites
