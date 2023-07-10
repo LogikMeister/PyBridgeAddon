@@ -2,7 +2,9 @@
 
 # PyBridgeAddon
 
-PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling asynchronous calls to Python 3.8.10 functions from Node.js, using Pybind11 and an independent C++ thread pool.
+PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling asynchronous calls to Python functions from Node.js, using Pybind11 and an independent C++ thread pool.
+
+**[New Change](#changelog): 2023/07/10**
 
 ## Table of Contents
 1. [Getting Started](#getting-started)
@@ -16,7 +18,9 @@ PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling a
 
 1. PyBridgeAddon provides Python call support through Node extension bindings, utilizing `an independent thread pool instead of Libuv` in Node.js.
 2. This has two major advantages: first, it keeps the two systems isolated; second, it circumvents the limitations of the Python GIL lock. Submitting multiple tasks, especially compute-intensive ones, could otherwise lead to Libuv thread pool blocking. 
-3. PyBridgeAddon is designed with `Python 3.8.10` in mind, which is the last version supporting Windows 7. The repository includes headers, libraries, and DLLs required by node-gyp. PyBridgeAddon supports both `TypeScript` and `ESM/CJS modules` in your application.
+3. PyBridgeAddon is designed to work with Python 3.X. **The package automatically searches for the necessary Python headers and libraries using node-gyp in PATH environment variable**.
+4. When you install `'pybridge-addon'` using npm, the `python.dll` and `pythonXX.dll` files required by the Python interpreter will be **automatically copied to the "dll" folder in the root directory of the package**. This ensures that the necessary dll files are included in the system path (by adding the "dll" folder to the PATH environment variable), guaranteeing the distribution of your Electron application or other applications.
+4. PyBridgeAddon supports both `TypeScript` and `ESM/CJS` modules in your application.
 
 <div align=center><img src="https://github.com/LogikMeister/PyBridgeAddon/blob/master/prototype.png" alt="Prototype" width="400"></div>
 
@@ -24,8 +28,7 @@ PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling a
 ### Prerequisites
 
 - `Node.js` (version 16 or higher) (Lower versions of node.js have not been tested)
-- `Python` 3.8.10
-- `Pybind11` (version 2.10.4)
+- `Python` 3.X (Make sure to add the Python directory to your path environment variable to ensure successful installation of the package.)
 
 ### Installation
 
@@ -98,13 +101,13 @@ First:
   ├── libs/ -  --  --  --  --  --  -- Can Delete
   ├── Scripts/ --  --  --  --  --  -- Can Delete
   │   ├── pip.exe
-  │   ├── pip3.exe
-  │   ├── pip3.8.exe
+  │   ├── pipX.exe
+  │   ├── pipX.X.exe
   │   └── ...
   ├── Tools/ - --  --  --  --  --  -- Can Delete
   ├── python.exe   --  --  --  --  -- Can Delete
   ├── pythonw.exe  --  --  --  --  -- Can Delete
-  └── pythonXX.dll --  --  --  --  -- Can Delete. When you install 'pybridge-addon' using npm and execute your code, the directories containing the required pythonXX.dll will be automatically added to the path.
+  └── pythonXX.dll --  --  --  --  -- Can Delete. When you install 'pybridge-addon' using npm and execute your code, the directories containing the required pythonXX.dll will be automatically added to the PATH environment variable.
   
   ```
 
@@ -241,21 +244,17 @@ As a new coder myself, I warmly welcome code contributions to PyBridgeAddon. Ple
 ## Changelog
 
 1. 2023/07/07: First Version.
-2. 2023/07/10: Fixed bugs and added tests.
+2. 2023/07/10: Fixed bugs and added tests. The package now dynamically searches for the appropriate version of Python in your PATH environment variable, ensuring compatibility across different Python versions.
 
 ## Tips
-
-### Generate Your Addon Projects
-
-1. Currently, this package only supports Python 3.8.10 on Windows due to its compatibility with Windows 7, which is the latest version supported by Python 3.8.10.
-
-2. If you require other add-on versions, feel free to fork this project and generate your customized add-on project.
 
 ### Future 
 
 1. Add support for dynamic thread pool.
 
 2. Expand data mapping support.
+
+3. Add support for mac or linux.
 
 ## License
 
