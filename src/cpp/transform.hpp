@@ -7,11 +7,10 @@
 #include <stdlib.h>
 #include <regex>
 #include <memory>
-// #include <nlohmann/json.hpp>
 #include "./variant.hpp"
+#include <iostream>
 
 namespace py = pybind11;
-// using json = nlohmann::json;
 
 inline void transform_n_2_variant(napi_env env, napi_value js_value, Variant& result) {
     napi_valuetype value_type;
@@ -115,6 +114,9 @@ inline py::object transform_variant_2_p(const Variant& variant) {
 inline void transform_p_2_variant(py::object py_value, Variant& result) {
     if (py::isinstance<py::none>(py_value)) {
         result = Variant();
+    } else if (py::isinstance<py::bool_>(py_value)) {
+        bool bool_value = py::cast<bool>(py_value);
+        result = Variant(bool_value);
     } else if (py::isinstance<py::float_>(py_value)) {
         double number_value = py::cast<double>(py_value);
         result = Variant(number_value);
@@ -124,9 +126,6 @@ inline void transform_p_2_variant(py::object py_value, Variant& result) {
     } else if (py::isinstance<py::str>(py_value)) {
         std::string str_value = py::cast<std::string>(py_value);
         result = Variant(std::move(str_value));
-    } else if (py::isinstance<py::bool_>(py_value)) {
-        bool bool_value = py::cast<bool>(py_value);
-        result = Variant(bool_value);
     } else if (py::isinstance<py::list>(py_value)) {
         py::list py_list = py::cast<py::list>(py_value);
         uint32_t array_len = py_list.size();

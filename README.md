@@ -18,6 +18,8 @@ PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling a
 2. This has two major advantages: first, it keeps the two systems isolated; second, it circumvents the limitations of the Python GIL lock. Submitting multiple tasks, especially compute-intensive ones, could otherwise lead to Libuv thread pool blocking. 
 3. PyBridgeAddon is designed with `Python 3.8.10` in mind, which is the last version supporting Windows 7. The repository includes headers, libraries, and DLLs required by node-gyp. PyBridgeAddon supports both `TypeScript` and `ESM/CJS modules` in your application.
 
+![Prototype](https://github.com/LogikMeister/PyBridgeAddon/blob/master/prototype.png)
+
 ### Prerequisites
 
 - `Node.js` (version 16 or higher) (Lower versions of node.js have not been tested)
@@ -225,12 +227,6 @@ const test = new Test();
 
 test.call().then((res) => {
     console.log("The Python function result returned by the decorated function: ", res)
-}).catch((err) => {
-    console.log(err)
-});
-
-interpreter.callAsync<undefined, number>("app", "call").then((res) => {
-    console.log("The Python function result via the addon API: ", res)
 }).catch((err) => {
     console.log(err)
 });

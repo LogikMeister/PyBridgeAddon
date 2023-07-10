@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "ES2016",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-        "module": "CommonJS",                                /* Specify what module code is generated. */
+        "module": "ESNext",                                /* Specify what module code is generated. */
         "allowJs": true,                                  /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
         "declaration": true,                              /* Generate .d.ts files from TypeScript and JavaScript files in your project. */
         "outDir": "./dist",
@@ -11,6 +11,8 @@
         "skipLibCheck": true,                                /* Skip type checking all .d.ts files. */
         "noImplicitAny": false,
     },
+    "include": [
+        "src/ts/**/*"
+    ],
     "exclude": ["node_modules"]
-  }
-  
+}

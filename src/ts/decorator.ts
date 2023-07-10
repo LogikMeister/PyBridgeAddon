@@ -6,22 +6,19 @@ export function makeGuardDecorator<T, A extends any[]>(
         // Method Decorator
         return function <This, Args extends A, Return>(
             target: (this: This, ...args: Args) => Return,
-            context: ClassMethodDecoratorContext<
-                This,
-                (this: This, ...args: Args) => Return
-            >
+            context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Return>
         ) {
-            const methodName = String(context.name);
+            const methodName = String(context.name)
 
             const replaceMethod = function (this: This, ...args: Args) {
                 if (fn(t, this, ...args)) {
-                    return target.call(this, ...args);
+                    return target.call(this, ...args)
                 }
                 // 如果校验失败
-                throw new Error(`${methodName}: ${errMessage}, arg: ${t}`);
-            };
+                throw new Error(`${methodName}: ${errMessage}, arg: ${t}`)
+            }
 
-            return replaceMethod;
-        };
-    };
+            return replaceMethod
+        }
+    }
 }

@@ -1,7 +1,5 @@
 'use strict';
 
-var node_module = require('node:module');
-var node_url = require('node:url');
 var path = require('node:path');
 var process = require('node:process');
 
@@ -148,20 +146,18 @@ function makeGuardDecorator(fn, errMessage) {
     };
 }
 
-const __filename$1 = node_url.fileURLToPath((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (document.currentScript && document.currentScript.src || new URL('index.js', document.baseURI).href)));
-const __dirname$1 = path.dirname(__filename$1);
-const require$1 = node_module.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (document.currentScript && document.currentScript.src || new URL('index.js', document.baseURI).href)));
-const resolve = (p) => path.resolve(__dirname$1, p);
+const resolve = (p) => path.resolve(__dirname, p);
 let addon;
 try {
     const dynamic_linked_library_path = resolve('../../dll');
     process.env.PATH = dynamic_linked_library_path + ";" + process.env.PATH;
-    addon = require$1(resolve('../../build/Release/pybridge'));
+    addon = require(resolve('../../build/Release/pybridge'));
 }
 catch (e) {
-    throw new Error('[Error]: Failed to load pybridge addon. Please check if pythonXX.dll exists in the environment variable PATH.');
+    throw new Error('[Addon Import Error]: Failed to load pybridge addon. Please check if pythonXX.dll exists in the environment variable PATH.');
 }
-const isFalse = makeGuardDecorator((property, instance, ..._rest) => instance[property] === false, "Python interpreter has not been initialized");
+const needUnintialized = makeGuardDecorator((property, instance, ..._rest) => instance[property] === false, "Python interpreter has not been initialized");
+const needUnintializFailed = makeGuardDecorator((property, instance, ..._rest) => instance[property] === false, "Python interpreter initialization failure is destructive. You need to restart you node application to initialize Python interpreter.");
 let Interpreter = (() => {
     var _a;
     let _instanceExtraInitializers = [];
@@ -169,32 +165,30 @@ let Interpreter = (() => {
     return _a = class Interpreter {
             constructor() {
                 this.isInitialized = (__runInitializers(this, _instanceExtraInitializers), false);
+                this.pythonInitalizFailed = false;
             }
             initialize(pythonHome, pythonPath, threads) {
                 this.pythonHome = pythonHome;
                 this.pythonPath = pythonPath;
                 try {
                     addon.initializePython(this.pythonHome, this.pythonPath, threads);
-                    const res = addon.isInitialized();
-                    if (res) {
-                        this.isInitialized = true;
-                        return this.isInitialized;
-                    }
-                    else {
-                        throw new Error();
-                    }
+                    addon.isInitialized();
+                    this.isInitialized = true;
+                    return this.isInitialized;
                 }
                 catch (e) {
                     this.isInitialized = false;
-                    console.error("[Error]:", e.message);
+                    this.pythonInitalizFailed = true;
                     throw new Error(`Failed to initialize Python interpreter at ${pythonHome}.`);
                 }
             }
             finalize() {
+                let isSuccess = false;
                 if (this.isInitialized && addon.isInitialized()) {
-                    addon.finalizePython();
+                    isSuccess = addon.finalizePython();
                 }
                 this.isInitialized = false;
+                return isSuccess;
             }
             call(moduleName, methodName, args) {
                 if (!this.isInitialized) {
@@ -221,7 +215,7 @@ let Interpreter = (() => {
             }
         },
         (() => {
-            _initialize_decorators = [isFalse("isInitialized")];
+            _initialize_decorators = [needUnintializFailed("pythonInitalizFailed"), needUnintialized("isInitialized")];
             __esDecorate(_a, null, _initialize_decorators, { kind: "method", name: "initialize", static: false, private: false, access: { has: obj => "initialize" in obj, get: obj => obj.initialize } }, null, _instanceExtraInitializers);
         })(),
         _a;
@@ -230,3 +224,4 @@ const interpreter = new Interpreter();
 
 exports.event = event;
 exports.interpreter = interpreter;
+//# sourceMappingURL=index.js.map

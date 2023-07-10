@@ -19,7 +19,8 @@ public:
 
     static void createInstance(unsigned int thread_nums) {
         if (instance != nullptr) {
-            throw std::runtime_error("GloablThreadPool instance has already been created!");
+            // Destroy the thread pool
+            GlobalThreadPool::destroyInstance();
         }
         instance = new GlobalThreadPool();
         instance->thread_pool = new ThreadPool(thread_nums);

@@ -44,7 +44,14 @@ inline napi_value CallPythonFunctionSync(napi_env env, napi_callback_info info) 
     Variant function_args;
     if (argc >= 3) {
         napi_typeof(env, argv[2], &arg_types[2]);
-        if (arg_types[2] != napi_object && arg_types[2] != napi_null && arg_types[2] != napi_undefined) {
+        if (
+            arg_types[2] != napi_object &&
+            arg_types[2] != napi_null &&
+            arg_types[2] != napi_undefined &&
+            arg_types[2] != napi_number &&
+            arg_types[2] != napi_string &&
+            arg_types[2] != napi_boolean
+        ) {
             napi_throw_type_error(env, nullptr, "Wrong arguments");
             return nullptr;
         }

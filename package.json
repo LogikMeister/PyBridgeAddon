@@ -12,7 +12,21 @@
     "build:ts": "rimraf dist && rollup -c",
     "build:addon": "node-gyp rebuild",
     "build": "npm run build:ts && npm run build:addon",
-    "build:dependencies": "npm i node-gyp"
+    "build:dependencies": "npm i node-gyp",
+    "test": "nyc mocha -r ts-node/register 'tests/**/*.test.ts'",
+    "lint": "eslint src --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix"
+  },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "include": [
+      "dist/cjs/**/*.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ],
+    "sourceMap": true,
+    "instrument": true
   },
   "authors": [
     "LogikMeister (zhaoyirangod@gmail.com)"
@@ -37,14 +51,26 @@
   "license": "MIT",
   "gypfile": true,
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@rollup/plugin-commonjs": "^25.0.2",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.2",
+    "@types/chai": "^4.3.5",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^20.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "chai": "^4.3.7",
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "mocha": "^10.2.0",
     "node-gyp": "^9.4.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.8.2",
     "rimraf": "^5.0.1",
     "rollup": "^3.26.1",
+    "ts-node": "^10.9.1",
     "tslib": "^2.6.0",
     "typescript": "^5.1.6"
   },

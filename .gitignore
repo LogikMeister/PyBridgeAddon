@@ -4,3 +4,5 @@ build
 node_modules
 resource
 test
+__pycache__
+.nyc_output

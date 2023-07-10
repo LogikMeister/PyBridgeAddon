@@ -6,6 +6,7 @@
 #include "../thread_pool/singleton.hpp"
 #include "../utils.hpp"
 #include "../gil.hpp"
+#include <iostream>
 
 namespace py = pybind11;
 
@@ -52,10 +53,23 @@ inline napi_value InitializePython(napi_env env, napi_callback_info info) {
     setenv("PYTHONHOME", pythonHome, 1);
     setenv("PYTHONPATH", pythonPath, 1);
 
+    std::cout << pythonHome << " " << pythonPath << std::endl;
+
+    // initialize the Python interpreter
+    try {
+        py::initialize_interpreter();
+    } catch (std::exception & e) {
+        // a C++ exception occurred
+        napi_throw_error(env, nullptr, e.what());
+        return nullptr;
+    } catch (...) {
+        // an unknown exception occurred
+        napi_throw_error(env, nullptr, "Initailze Python failed, Please check your environment");
+        return nullptr;
+    }
+
     // initialize the thread pool
     GlobalThreadPool::createInstance(threads);
-    // initialize the Python interpreter
-    py::initialize_interpreter();
 
     napi_value resultValue;
     if (!Py_IsInitialized()) {
