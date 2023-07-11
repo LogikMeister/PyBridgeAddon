@@ -18,7 +18,7 @@ PyBridgeAddon: Integration for Windows applications (Electron, etc.), enabling a
 
 1. PyBridgeAddon provides Python call support through Node extension bindings, utilizing `an independent thread pool instead of Libuv` in Node.js.
 2. This has two major advantages: first, it keeps the two systems isolated; second, it circumvents the limitations of the Python GIL lock. Submitting multiple tasks, especially compute-intensive ones, could otherwise lead to Libuv thread pool blocking. 
-3. PyBridgeAddon is designed to work with Python 3.X. **The package automatically searches for the necessary Python headers and libraries using node-gyp in PATH environment variable**.
+3. PyBridgeAddon is designed to work with Python 3.X. **The package uses node-gyp to automatically search the PATH environment variable for necessary Python headers and libraries**.
 4. When you install `'pybridge-addon'` using npm, the `python.dll` and `pythonXX.dll` files required by the Python interpreter will be **automatically copied to the "dll" folder in the root directory of the package**. This ensures that the necessary dll files are included in the system path (by adding the "dll" folder to the PATH environment variable), guaranteeing the distribution of your Electron application or other applications.
 4. PyBridgeAddon supports both `TypeScript` and `ESM/CJS` modules in your application.
 
@@ -200,7 +200,7 @@ def call():
 ```
 
 ```typescript
-import { interpreter, event, ArgumentType } from '../dist/esm/index.js'
+import { interpreter, event, ArgumentType } from 'pybridge-addon'
 
 interpreter.initialize(pythonHome, pythonPath, undefined);
 
