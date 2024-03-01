@@ -1,10 +1,12 @@
 type BasicType = string | number | boolean | null | undefined
 
 interface ArgumentObject {
-    [key: string]: BasicType | Array<BasicType> | ArgumentObject | Array<ArgumentObject>
+    [key: string]: BasicType | ArgumentArray | ArgumentObject | Array<ArgumentObject>
 }
 
-export type ArgumentType = BasicType | ArgumentObject | Array<ArgumentObject> | Array<BasicType>
+type ArgumentArray = Array<BasicType> | Array<ArgumentArray> | Array<ArgumentObject>
+
+export type ArgumentType = BasicType | ArgumentObject | ArgumentArray
 
 export interface Addon {
     isInitialized(): boolean
